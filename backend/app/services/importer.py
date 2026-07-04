@@ -11,11 +11,19 @@ MAX_ENERGY_KWH = 1_000_000
 
 
 def normalize_timestamp(value: str, timezone_name: str) -> datetime:
+    """Normalize CSV timestamps to the target timezone with DST safeguards.
+
+    Naive local timestamps are accepted only when they map to exactly one local
+    instant. During DST transitions, ambiguous or non-existent local times must
+    include an explicit offset in the CSV, for example `+02:00` or `+01:00`.
+    """
     parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
     zone = ZoneInfo(timezone_name)
     if parsed.tzinfo is not None:
         return parsed.astimezone(zone)
 
+    # Roundtripping through UTC is the reliable stdlib way to detect local
+    # wall-clock times that do not exist, or that exist twice, in Europe/Rome.
     fold_0 = parsed.replace(tzinfo=zone, fold=0)
     fold_1 = parsed.replace(tzinfo=zone, fold=1)
     roundtrip_0 = fold_0.astimezone(UTC).astimezone(zone).replace(tzinfo=None)

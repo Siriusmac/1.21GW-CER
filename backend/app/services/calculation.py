@@ -15,6 +15,11 @@ def _round(value: float) -> float:
 
 
 def _normalize_datetime(value: datetime) -> datetime:
+    """Return a Europe/Rome aware datetime for filtering and presentation.
+
+    The importer rejects ambiguous/non-existent naive local times. This helper is
+    intentionally stricter for readings and permissive for API filter bounds.
+    """
     if value.tzinfo is None:
         return value.replace(tzinfo=ROME)
     return value.astimezone(ROME)
@@ -34,6 +39,14 @@ def calculate_summary(
     start: datetime | None = None,
     end: datetime | None = None,
 ) -> CalculationSummary:
+    """Calculate estimated CER sharing indicators from technical readings.
+
+    Important domain boundaries:
+    - output is always a non-validated technical estimate, not an official GSE result;
+    - interval keys are UTC instants to keep DST fall-back intervals distinct;
+    - production/grid injection and consumption/grid withdrawal are treated as
+      alternative measures for the same POD+interval, not as additive by default.
+    """
     start_rome = _normalize_datetime(start) if start else None
     end_rome = _normalize_datetime(end) if end else None
 
@@ -48,6 +61,8 @@ def calculate_summary(
         timestamp = _normalize_datetime(reading.timestamp)
         if (start_rome is not None and timestamp < start_rome) or (end_rome is not None and timestamp > end_rome):
             continue
+        # UTC is the aggregation key so 02:15+02:00 and 02:15+01:00
+        # during the autumn DST transition remain separate intervals.
         interval_key = timestamp.astimezone(UTC)
         by_timestamp_pod[interval_key][reading.pod_id][reading.direction] += reading.energy_kwh
 
@@ -60,6 +75,9 @@ def calculate_summary(
             consumption = directions.get(EnergyDirection.consumption, 0.0)
             grid_withdrawal = directions.get(EnergyDirection.grid_withdrawal, 0.0)
 
+            # These direction pairs may describe the same physical interval from
+            # different technical sources. Prefer the more directly shared-energy
+            # oriented measurement to avoid double counting.
             supply = grid_injection if grid_injection > 0 else production
             demand = consumption if consumption > 0 else grid_withdrawal
 

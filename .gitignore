@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+node_modules/
+dist/
+.pnpm-store/
+postgres_data/

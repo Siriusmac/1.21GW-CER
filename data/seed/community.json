@@ -1,0 +1,25 @@
+{
+  "id": "cer-demo",
+  "name": "CER Demo Cabina Primaria Roma Nord",
+  "primary_substation": "CP-ROMA-NORD-01",
+  "benefit_rule": "proportional_consumption",
+  "members": [
+    {
+      "id": "m-001",
+      "name": "Condominio Via Solare",
+      "role": "consumer",
+      "pods": [{ "id": "POD-CONS-001", "code": "IT001E00000001", "direction_type": "consumption" }],
+      "plants": []
+    },
+    {
+      "id": "m-002",
+      "name": "Azienda Agricola Luce",
+      "role": "prosumer",
+      "pods": [
+        { "id": "POD-CONS-002", "code": "IT001E00000002", "direction_type": "consumption" },
+        { "id": "POD-PROD-001", "code": "IT001E00000003", "direction_type": "production" }
+      ],
+      "plants": [{ "id": "plant-001", "name": "FV Tetto Magazzino", "capacity_kw": 85.0, "pod_id": "POD-PROD-001" }]
+    }
+  ]
+}

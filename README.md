@@ -77,6 +77,18 @@ Esempi disponibili in [data/sample/energy_readings.csv](/Users/simone/Documents/
 
 La prima milestone evita hardcoding di regole GSE definitive: l'incentivo e la granularita sono parametri, e le integrazioni ufficiali sono lasciate a provider futuri.
 
+### Regole del motore di calcolo
+
+- I timestamp importati vengono normalizzati su `Europe/Rome`.
+- Gli intervalli sono aggregati internamente in UTC, per non fondere le due ore locali duplicate nel passaggio da ora legale a ora solare.
+- Timestamp locali ambigui o inesistenti durante i cambi ora vengono rifiutati se non includono un offset esplicito.
+- Sono accettati intervalli orari e quartorari.
+- Per evitare doppio conteggio nello stesso POD e timestamp:
+  - lato produzione, `grid_injection` prevale su `production` quando entrambe sono presenti;
+  - lato domanda, `consumption` prevale su `grid_withdrawal` quando entrambe sono presenti;
+  - righe duplicate della stessa direzione vengono sommate.
+- Gli output restano sempre marcati come `stima tecnica non validata`.
+
 ## Test
 
 ```bash

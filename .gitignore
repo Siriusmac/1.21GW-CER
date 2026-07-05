@@ -8,3 +8,4 @@ node_modules/
 dist/
 .pnpm-store/
 postgres_data/
+tmp/

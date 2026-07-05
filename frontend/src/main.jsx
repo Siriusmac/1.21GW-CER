@@ -5,6 +5,7 @@ import { CalendarDays, CircleUserRound, Gauge, Upload } from "lucide-react";
 import { EnergyChart } from "./components/EnergyChart.jsx";
 import { Kpi } from "./components/Kpi.jsx";
 import { MemberTable } from "./components/MemberTable.jsx";
+import cerLogo from "./assets/cer-logo.png";
 import { getAdminDashboard, getCommunity, getMemberDashboard } from "./lib/api.js";
 import "./styles/app.css";
 
@@ -50,10 +51,13 @@ function App() {
   return (
     <main>
       <header className="topbar">
-        <div>
-          <p className="eyebrow">Comunità Energetica Rinnovabile</p>
-          <h1>{community.name}</h1>
-          <p className="subtle">{community.primary_substation}</p>
+        <div className="brand-lockup">
+          <img className="brand-mark" src={cerLogo} alt="Logo 1,21 Gigawatt" />
+          <div>
+            <p className="eyebrow">Comunità Energetica Rinnovabile</p>
+            <h1>1,21 Gigawatt</h1>
+            <p className="subtle">{community.name} · {community.primary_substation}</p>
+          </div>
         </div>
         <span className="status">{summary.label}</span>
       </header>
